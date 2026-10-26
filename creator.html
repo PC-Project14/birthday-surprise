@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Birthday Surprise Creator</title>
+<style>
+:root{--bg:#0b0b19;--card:#17172b;--pink:#ff8fbd;--purple:#a78bfa;--text:#f7f3ff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#080812,#17112a);color:var(--text);font:16px/1.5 system-ui,Arial,sans-serif;padding:24px}
+main{max-width:900px;margin:auto}.hero{text-align:center;padding:18px 0 28px}.hero h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 8px}.hero p{color:#c9c4e2}
+form{display:grid;gap:18px}.panel{background:#17172b;border:1px solid #373253;border-radius:18px;padding:20px}.panel h2{font-size:1.15rem;margin:0 0 14px;color:#e4d8ff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+label{display:grid;gap:6px;font-weight:600}input,textarea,select{width:100%;padding:11px;border:1px solid #51496f;border-radius:10px;background:#0d0d1c;color:white;font:inherit}textarea{min-height:90px;resize:vertical}.hint{font-size:.88rem;color:#b9b2d7;font-weight:400}
+button{border:0;border-radius:999px;padding:13px 20px;background:linear-gradient(90deg,#a78bfa,#ff8fbd);color:#160e28;font-weight:800;font-size:1rem;cursor:pointer}
+.warning{border-left:4px solid #ffcf70;padding:10px 14px;background:#302718;border-radius:8px;color:#ffedc5}.success{display:none;margin-top:18px;padding:16px;border:1px solid #4c946c;border-radius:12px;background:#10271d}.success a{color:#a7f3c2}.small{font-size:.9rem;color:#c7c1dd}footer{padding:18px 0;text-align:center;color:#aaa4c2}
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <h1>✨ Birthday Surprise Creator</h1>
+    <p>Fill in the details, add photos and optional music, then download a personalized birthday page.</p>
+  </header>
+  <div class="warning"><strong>Important:</strong> This is a static, no-backend creator. It creates a separate HTML file on your device; it does not publish it automatically. GitHub Pages repositories are public by default, so only use photos/messages you have permission to share. The expiry is browser-side and can be bypassed by technical users.</div>
+  <form id="creatorForm">
+    <section class="panel">
+      <h2>1. Recipient and schedule</h2>
+      <div class="grid">
+        <label>Recipient's name<input id="recipient" required maxlength="60" placeholder="e.g. Ananya"></label>
+        <label>Your name / sign-off<input id="sender" maxlength="60" placeholder="e.g. From, your best friend"></label>
+        <label>Birthday date<input id="birthday" type="date" required></label>
+      </div>
+      <p class="hint">Timing uses India Standard Time: activates at 11:50 PM the day before the birthday and expires at 11:59:59 PM on the birthday.</p>
+    </section>
+    <section class="panel">
+      <h2>2. Memories and photos</h2>
+      <div class="grid">
+        <label>Photo 1 — opening memory<input id="photo1" type="file" accept="image/*"><span class="hint">Optional; recommended image under 1 MB.</span></label>
+        <label>Caption for photo 1<input id="caption1" maxlength="180" placeholder="That unforgettable day..."></label>
+        <label>Photo 2 — favorite memory<input id="photo2" type="file" accept="image/*"><span class="hint">Optional; recommended image under 1 MB.</span></label>
+        <label>Caption for photo 2<input id="caption2" maxlength="180" placeholder="Still makes me smile."></label>
+        <label>Photo 3 — another memory<input id="photo3" type="file" accept="image/*"><span class="hint">Optional; recommended image under 1 MB.</span></label>
+        <label>Caption for photo 3<input id="caption3" maxlength="180" placeholder="More beautiful moments ahead."></label>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>3. Personal message and magic words</h2>
+      <div class="grid">
+        <label>Magic words<input id="magic" maxlength="100" placeholder="You make the world brighter"></label>
+        <label>Card heading<input id="cardTitle" maxlength="100" placeholder="To someone truly special"></label>
+      </div>
+      <label style="margin-top:14px">Personal birthday letter<textarea id="message" required maxlength="2500" placeholder="Write your heartfelt birthday message here..."></textarea></label>
+      <label style="margin-top:14px">Final surprise message<textarea id="finalMessage" maxlength="1000" placeholder="One last thing I want you to know..."></textarea></label>
+    </section>
+    <section class="panel">
+      <h2>4. Background music</h2>
+      <label>Choose an audio file (optional)<input id="music" type="file" accept="audio/*"></label>
+      <p class="hint">Use audio you have permission to share. Large music files make the generated HTML large. Browsers may require the recipient to tap the music button before audio plays.</p>
+    </section>
+    <button type="submit">Create personalized birthday file ✨</button>
+  </form>
+  <div class="success" id="success" role="status">
+    <h2>Your personalized file is ready!</h2>
+    <p id="resultText"></p>
+    <p><a id="downloadLink" download="birthday-surprise.html">Download the birthday website</a></p>
+    <p class="small">To publish it: upload this downloaded HTML file into your GitHub repository. The recipient's URL will end with that filename, for example <code>https://YOUR-USERNAME.github.io/YOUR-REPOSITORY/ananya-birthday.html</code>. After uploading, wait for GitHub Pages to deploy and test the URL.</p>
+  </div>
+  <footer>Made with ✨ for a memorable birthday</footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const readFile = file => new Promise((resolve,reject) => {
+  if (!file) return resolve("");
+  if (file.size > 3 * 1024 * 1024) return reject(new Error(file.name + " is over 3 MB. Choose a smaller file."));
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = () => reject(new Error("Could not read " + file.name));
+  reader.readAsDataURL(file);
+});
+function safeJson(value){return JSON.stringify(value).replace(/</g,"\\u003c").replace(/>/g,"\\u003e").replace(/&/g,"\\u0026");}
+function makeRecipientPage(d){
+ const data = safeJson(d);
+ return `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>A surprise for ${escapeHtml(d.recipient)} ✨</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#27204b,#080812 70%);color:#fff;font-family:system-ui,Arial,sans-serif;text-align:center;overflow-x:hidden}.stars{position:fixed;inset:0;pointer-events:none;overflow:hidden}.star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle 2s infinite alternate}@keyframes twinkle{from{opacity:.15}to{opacity:1}}main{position:relative;z-index:1;min-height:100vh;display:grid;place-items:center;padding:24px}.stage{display:none;width:min(760px,100%);padding:clamp(20px,5vw,42px);border:1px solid #51456e;background:#151329eF;border-radius:24px;box-shadow:0 20px 70px #0008;animation:appear .7s ease}.stage.active{display:block}@keyframes appear{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}h1{font-size:clamp(2rem,7vw,3.5rem);line-height:1.12;margin:12px 0}h2{color:#e8d9ff}p{font-size:1.08rem;line-height:1.75;color:#e1dcef;white-space:pre-wrap}.eyebrow{color:#ffb7d4;letter-spacing:.13em;text-transform:uppercase;font-size:.8rem}.btn{border:0;border-radius:999px;padding:13px 25px;margin:12px 5px;background:linear-gradient(90deg,#b39aff,#ff9dc7);color:#1c102c;font-weight:800;font-size:1rem;cursor:pointer}.btn.secondary{background:#27223f;color:#fff;border:1px solid #71638f}.photo{width:min(100%,430px);max-height:360px;object-fit:contain;border-radius:16px;border:5px solid #fff;box-shadow:0 12px 35px #0007}.caption{font-style:italic;color:#ffc6df}.magic{font-size:clamp(1.5rem,5vw,2.5rem);color:#ffd3e7;text-shadow:0 0 20px #ff73bc}.letter{background:#fff8e9;color:#47334c;border-radius:14px;padding:22px;text-align:left;white-space:pre-wrap;line-height:1.8}.letter p{color:#47334c}.cake{font-size:5rem;cursor:pointer;filter:drop-shadow(0 0 18px #ff8fbd)}.gift{font-size:5rem;cursor:pointer;animation:bob 1.5s infinite}@keyframes bob{50%{transform:translateY(-10px)}}.card{padding:25px;border:2px solid #ffb8d8;border-radius:18px;background:linear-gradient(140deg,#fff1f7,#eee5ff);color:#4b2852}.card h1,.card p{color:#4b2852}.photos{display:grid;gap:20px}.muted{font-size:.88rem;color:#b9b0d2}#musicBtn{position:fixed;z-index:5;right:12px;top:12px;border:1px solid #74648e;background:#1c1833;color:white;border-radius:999px;padding:10px 13px;cursor:pointer}#confetti{font-size:2rem;letter-spacing:.3em}.blocked{max-width:600px;padding:25px}.hide{display:none!important}@media(min-width:650px){.photos{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.photos .photo{max-height:230px}}
+</style></head><body><div class="stars" id="stars"></div><button id="musicBtn" class="hide" type="button">♫ Turn music on</button><audio id="audio" loop></audio><main><section id="blocked" class="blocked"><h1>One moment ✨</h1><p id="blockedText">Checking the surprise time…</p></section>
+<section class="stage" id="s1"><div class="eyebrow">A little mystery</div><h1>A small surprise for you, ${escapeHtml(d.recipient)}…</h1><p>Some memories, a little magic, and a lot of love are waiting inside.</p><p>Are you ready?</p><button class="btn" onclick="next(2)">Unlock ✦</button></section>
+<section class="stage" id="s2"><div class="eyebrow">Chapter 1 · Our memories</div><h1>Little moments, big memories 📸</h1><div class="photos" id="photos"></div><p>Every memory is a little treasure. Here are a few of mine with you.</p><button class="btn" onclick="next(3)">Next memory ✨</button></section>
+<section class="stage" id="s3"><div class="eyebrow">Chapter 2 · Magic words</div><h1>A little magic, just for you</h1><p class="magic" id="magicText"></p><p>Some people make ordinary moments feel extraordinary. You are one of them.</p><button class="btn" onclick="sparkle()">Make it magical ✨</button><button class="btn secondary" onclick="next(4)">Continue</button><p id="sparkleText"></p></section>
+<section class="stage" id="s4"><div class="eyebrow">Chapter 3 · From the heart</div><h1>A message for you 💌</h1><div class="letter"><p id="messageText"></p><p id="senderText"></p></div><button class="btn" onclick="next(5)">Open your card</button></section>
+<section class="stage" id="s5"><div class="eyebrow">Made just for you</div><div class="card"><div style="font-size:3rem">💐</div><h1 id="cardTitle"></h1><p>Happy Birthday, <strong id="cardName"></strong>!</p><p>May this new chapter bring you kindness, courage, laughter, and beautiful surprises.</p><div style="font-size:2rem">✨ 💖 ✨</div></div><button class="btn" onclick="next(6)">There's more…</button></section>
+<section class="stage" id="s6"><div class="eyebrow">Make a wish</div><h1>Your birthday cake 🎂</h1><div class="cake" onclick="blowCandles()">🎂</div><p id="cakeText">Tap the cake to blow out the candles and make a wish.</p><button class="btn" onclick="next(7)">Wish made ✨</button></section>
+<section class="stage" id="s7"><div class="eyebrow">One last little gift</div><h1>A gift from the heart 🎁</h1><div class="gift" onclick="openGift()">🎁</div><p id="giftText">Tap the gift to open it.</p><button class="btn" onclick="next(8)">Reveal the finale</button></section>
+<section class="stage" id="s8"><div class="eyebrow">With all my wishes</div><div id="confetti">🎉 ✨ 🎊</div><h1>Happy Birthday, ${escapeHtml(d.recipient)}! 🎂</h1><p id="finalText"></p><p>Keep shining. The world is brighter with you in it. 💖</p><p id="finalSender"></p><button class="btn secondary" onclick="location.reload()">Experience again</button></section>
+</main>
+<script>
+const D=${data};
+const start=new Date(D.birthday+"T00:00:00+05:30").getTime()-10*60*1000;
+const end=new Date(D.birthday+"T23:59:59.999+05:30").getTime();
+const blocked=document.getElementById("blocked"), blockedText=document.getElementById("blockedText");
+let activeStage=1, expired=false;
+function checkTime(){const now=Date.now();if(now<start){blocked.classList.remove("hide");blockedText.textContent="Your surprise unlocks at 11:50 PM IST on the day before the birthday. Come back soon! ✨";document.querySelectorAll(".stage").forEach(x=>x.classList.remove("active"));return false}if(now>end){expired=true;blocked.classList.remove("hide");blockedText.textContent="This birthday surprise has expired. Thank you for sharing the magic! 💫";document.querySelectorAll(".stage").forEach(x=>x.classList.remove("active"));return false}blocked.classList.add("hide");return true}
+function next(n){if(!checkTime())return;document.querySelectorAll(".stage").forEach(x=>x.classList.remove("active"));document.getElementById("s"+n).classList.add("active");activeStage=n;window.scrollTo(0,0)}
+function put(id,value){document.getElementById(id).textContent=value||""}
+function sparkle(){put("sparkleText","✦ ✧ ✨ ✧ ✦\nYour wish is wrapped in a little stardust! 💖")}
+function blowCandles(){put("cakeText","The candles are out! 🌬️ May your wish find its way to you. ✨");document.querySelector(".cake").textContent="🍰"}
+function openGift(){put("giftText",D.finalMessage||"The best gifts are the memories we make and the love we share. Happy Birthday! 💖");document.querySelector(".gift").textContent="💝"}
+function init(){put("magicText",D.magic);put("messageText",D.message);put("senderText",D.sender?"With love, "+D.sender:"With love 💖");put("cardTitle",D.cardTitle||"To someone truly special");put("cardName",D.recipient);put("finalText",D.finalMessage||"I hope this little surprise made you smile. You deserve all the wonderful things life has to offer.");put("finalSender",D.sender?"Forever cheering for you, "+D.sender:"Made with love ✨");
+const photos=document.getElementById("photos");D.photos.forEach((p,i)=>{if(!p.src)return;const wrap=document.createElement("div");const img=document.createElement("img");img.className="photo";img.src=p.src;img.alt="Birthday memory "+(i+1);const cap=document.createElement("p");cap.className="caption";cap.textContent=p.caption||"A memory to treasure ✨";wrap.append(img,cap);photos.appendChild(wrap)});
+if(D.music){const audio=document.getElementById("audio");audio.src=D.music;const b=document.getElementById("musicBtn");b.classList.remove("hide");b.onclick=async()=>{try{if(audio.paused){await audio.play();b.textContent="♫ Turn music off"}else{audio.pause();b.textContent="♫ Turn music on"}}catch(e){b.textContent="Tap to enable music"}}}
+if(checkTime())document.getElementById("s1").classList.add("active");}
+function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+init();setInterval(()=>{if(!checkTime())expired=true},5000);
+<\/script></body></html>`;
+}
+function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+$("creatorForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ try{
+  const birthday=$("birthday").value;
+  if(!birthday)throw new Error("Please choose the birthday date.");
+  const photos=[];
+  for(let i=1;i<=3;i++){
+    photos.push({src:await readFile($("photo"+i).files[0]),caption:$("caption"+i).value.trim()});
+  }
+  const music=await readFile($("music").files[0]);
+  const d={recipient:$("recipient").value.trim(),sender:$("sender").value.trim(),birthday,
+    magic:$("magic").value.trim(),cardTitle:$("cardTitle").value.trim(),
+    message:$("message").value.trim(),finalMessage:$("finalMessage").value.trim(),photos,music};
+  if(!d.recipient||!d.message)throw new Error("Please fill in the recipient name and personal birthday letter.");
+  const html=makeRecipientPage(d);
+  const blob=new Blob([html],{type:"text/html;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const filename=(d.recipient.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"birthday")+"-birthday.html";
+  const link=$("downloadLink");link.href=url;link.download=filename;
+  $("resultText").textContent="Created "+filename+". Keep the file safe, then upload it to your GitHub repository to publish the recipient link.";
+  $("success").style.display="block";$("success").scrollIntoView({behavior:"smooth"});
+ }catch(err){alert(err.message||"Something went wrong while creating the file.");}
+});
+</script>
+</body>
+</html>
