@@ -96,8 +96,9 @@ function makeRecipientPage(d){
 </main>
 <script>
 const D=${data};
-const start=new Date(D.birthday+"T00:00:00+05:30").getTime()-10*60*1000;
-const end=new Date(D.birthday+"T23:59:59.999+05:30").getTime();
+
+const start = Date.now() - 60 * 1000;
+const end = Date.now() + 60 * 60 * 1000;
 const blocked=document.getElementById("blocked"), blockedText=document.getElementById("blockedText");
 let activeStage=1, expired=false;
 function checkTime(){const now=Date.now();if(now<start){blocked.classList.remove("hide");blockedText.textContent="Your surprise unlocks at 11:50 PM IST on the day before the birthday. Come back soon! ✨";document.querySelectorAll(".stage").forEach(x=>x.classList.remove("active"));return false}if(now>end){expired=true;blocked.classList.remove("hide");blockedText.textContent="This birthday surprise has expired. Thank you for sharing the magic! 💫";document.querySelectorAll(".stage").forEach(x=>x.classList.remove("active"));return false}blocked.classList.add("hide");return true}
