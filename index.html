@@ -1,13 +1,110 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>A Small Surprise</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      color: white;
+      background:
+        radial-gradient(ellipse at top, #182449, #050711 75%);
+      overflow: hidden;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(#a8baff 1px, transparent 1px);
+      background-size: 83px 83px, 127px 127px;
+      background-position: 0 0, 35px 45px;
+      opacity: 0.5;
+    }
+
+    main {
+      position: relative;
+      padding: 24px;
+      animation: appear 1.5s ease;
+    }
+
+    .intro {
+      color: #c5c9df;
+      letter-spacing: 3px;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(30px, 6vw, 48px);
+      line-height: 1.2;
+      text-shadow: 0 0 25px #9d8aff55;
+    }
+
+    .question {
+      color: #d5d7ed;
+      font-size: 17px;
+    }
+
+    button {
+      margin-top: 24px;
+      padding: 15px 38px;
+      border: 1px solid #e4d4ff;
+      border-radius: 40px;
+      background: linear-gradient(135deg, #e5d2ff, #a99aff);
+      color: #171026;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 25px #b69bff44;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+
+    button:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 35px #b69bff88;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <h1>A small surprise for you...</h1>
-  <p>Are you ready?</p>
-  <button>Unlock</button>
+  <div class="stars"></div>
+
+  <main>
+    <p class="intro">✦ A little mystery awaits ✦</p>
+    <h1>A small surprise<br>for you...</h1>
+    <p class="question">Are you ready?</p>
+
+    <button onclick="alert('Your magical surprise is waiting! ✨')">
+      Unlock ✦
+    </button>
+  </main>
 </body>
 </html>
+
