@@ -14,14 +14,13 @@
     body {
       margin: 0;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
       font-family: Arial, sans-serif;
       color: white;
-      background:
-        radial-gradient(ellipse at top, #182449, #050711 75%);
+      background: radial-gradient(
+        ellipse at top,
+        #182449,
+        #050711 75%
+      );
       overflow: hidden;
     }
 
@@ -37,10 +36,22 @@
       opacity: 0.5;
     }
 
-    main {
-      position: relative;
+    .screen {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
       padding: 24px;
-      animation: appear 1.5s ease;
+      overflow-y: auto;
+    }
+
+    .content {
+      width: 100%;
+      max-width: 600px;
+      animation: appear 1s ease;
     }
 
     .intro {
@@ -52,13 +63,22 @@
 
     h1 {
       font-size: clamp(30px, 6vw, 48px);
-      line-height: 1.2;
+      line-height: 1.25;
       text-shadow: 0 0 25px #9d8aff55;
     }
 
-    .question {
+    p {
+      line-height: 1.7;
       color: #d5d7ed;
-      font-size: 17px;
+    }
+
+    .magic {
+      font-size: 48px;
+      margin: 20px 0;
+    }
+
+    .hidden {
+      display: none;
     }
 
     button {
@@ -80,14 +100,32 @@
       box-shadow: 0 0 35px #b69bff88;
     }
 
+    .back-button {
+      background: transparent;
+      border-color: #8e91b7;
+      color: white;
+      box-shadow: none;
+    }
+
     @keyframes appear {
       from {
         opacity: 0;
         transform: translateY(15px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .content {
+        animation: none;
+      }
+
+      button {
+        transition: none;
       }
     }
   </style>
@@ -96,45 +134,90 @@
 <body>
   <div class="stars"></div>
 
-  <main>
-    <p class="intro">✦ A little mystery awaits ✦</p>
-    <h1>A small surprise<br>for you...</h1>
-    <p class="question">Are you ready?</p>
+  <!-- SCREEN 1: Mysterious opening -->
+  <section id="openingScreen" class="screen">
+    <div class="content">
+      <p class="intro">✦ A little mystery awaits ✦</p>
 
-    <button onclick="openSurprise()">
-      Unlock ✦
-    </button>
-  </main>
-</body>
-  
-<section id="nextScreen" style="
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: #080b1c;
-  color: white;
-  z-index: 10;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 24px;
-">
-  <p>✨ THE SECRET IS UNLOCKED ✨</p>
-  <h1>Someone special is celebrating!</h1>
-  <p>Every beautiful memory starts with a little moment.</p>
-  <button onclick="goBack()">Go Back</button>
-</section>
+      <h1>A small surprise<br>for you...</h1>
 
-<script>
-  function openSurprise() {
-    document.getElementById("nextScreen").style.display = "flex";
-  }
+      <p>Are you ready?</p>
 
-  function goBack() {
-    document.getElementById("nextScreen").style.display = "none";
-  }
-</script>
+      <button onclick="openSurprise()">
+        Unlock ✦
+      </button>
+    </div>
+  </section>
+
+  <!-- SCREEN 2: First surprise -->
+  <section id="nextScreen" class="screen hidden">
+    <div class="content">
+      <p class="intro">✦ SECRET UNLOCKED ✦</p>
+
+      <div class="magic">🔮</div>
+
+      <h1>Someone special<br>is celebrating!</h1>
+
+      <p>
+        Every beautiful memory starts with a little moment.
+        And today, something special is waiting for you.
+      </p>
+
+      <button onclick="showBirthday()">
+        Reveal the Magic ✨
+      </button>
+
+      <br>
+
+      <button class="back-button" onclick="goBack()">
+        Go Back
+      </button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: Birthday reveal -->
+  <section id="birthdayScreen" class="screen hidden">
+    <div class="content">
+      <p class="intro">✦ THIS MOMENT IS YOURS ✦</p>
+
+      <div class="magic">🎂🎉🎁</div>
+
+      <h1>Happy Birthday!</h1>
+
+      <p>
+        May your life be filled with beautiful memories,
+        unexpected happiness, endless laughter,
+        and people who make you feel special.
+      </p>
+
+      <p>Today is all about YOU. 💖</p>
+
+      <button onclick="restartSurprise()">
+        Experience Again ↻
+      </button>
+    </div>
+  </section>
+
+  <script>
+    function openSurprise() {
+      document.getElementById("openingScreen").classList.add("hidden");
+      document.getElementById("nextScreen").classList.remove("hidden");
+    }
+
+    function showBirthday() {
+      document.getElementById("nextScreen").classList.add("hidden");
+      document.getElementById("birthdayScreen").classList.remove("hidden");
+    }
+
+    function goBack() {
+      document.getElementById("nextScreen").classList.add("hidden");
+      document.getElementById("openingScreen").classList.remove("hidden");
+    }
+
+    function restartSurprise() {
+      document.getElementById("birthdayScreen").classList.add("hidden");
+      document.getElementById("openingScreen").classList.remove("hidden");
+    }
+  </script>
 </body>
 </html>
-
