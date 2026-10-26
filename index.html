@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A Small Surprise</title>
+  <title>A Birthday Surprise ✨</title>
 
   <style>
     * {
@@ -14,238 +14,234 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Arial, sans-serif;
-      color: white;
-      background: radial-gradient(
-        ellipse at top,
-        #182449,
-        #050711 75%
-      );
       overflow: hidden;
-    }
-
-    .stars {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        radial-gradient(white 1px, transparent 1px),
-        radial-gradient(#a8baff 1px, transparent 1px);
-      background-size: 83px 83px, 127px 127px;
-      background-position: 0 0, 35px 45px;
-      opacity: 0.5;
-    }
-
-    .screen {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #191936, #050510 70%);
+      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 24px;
-      overflow-y: auto;
     }
 
-    .content {
-      width: 100%;
-      max-width: 600px;
-      animation: appear 1s ease;
+    #stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
     }
 
-    .intro {
-      color: #c5c9df;
-      letter-spacing: 3px;
-      font-size: 12px;
-      text-transform: uppercase;
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite alternate;
     }
 
-    h1 {
-      font-size: clamp(30px, 6vw, 48px);
-      line-height: 1.25;
-      text-shadow: 0 0 25px #9d8aff55;
+    @keyframes twinkle {
+      from { opacity: 0.2; }
+      to { opacity: 1; }
     }
 
-    p {
-      line-height: 1.7;
-      color: #d5d7ed;
-    }
-
-    .magic {
-      font-size: 48px;
-      margin: 20px 0;
-    }
-
-    .hidden {
+    .screen {
       display: none;
+      position: relative;
+      z-index: 1;
+      width: 90%;
+      max-width: 550px;
+      padding: 25px;
+      animation: fadeIn 1s ease;
     }
 
-    button {
-      margin-top: 24px;
-      padding: 15px 38px;
-      border: 1px solid #e4d4ff;
-      border-radius: 40px;
-      background: linear-gradient(135deg, #e5d2ff, #a99aff);
-      color: #171026;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 0 25px #b69bff44;
-      transition: transform 0.25s, box-shadow 0.25s;
+    .screen.active {
+      display: block;
     }
 
-    button:hover {
-      transform: scale(1.06);
-      box-shadow: 0 0 35px #b69bff88;
-    }
-
-    .back-button {
-      background: transparent;
-      border-color: #8e91b7;
-      color: white;
-      box-shadow: none;
-    }
-
-    @keyframes appear {
+    @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(12px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .content {
-        animation: none;
-      }
+    h1 {
+      font-size: clamp(2rem, 7vw, 3rem);
+      margin-bottom: 18px;
+    }
 
-      button {
-        transition: none;
-      }
+    p {
+      color: #deddf5;
+      font-size: 1.1rem;
+      line-height: 1.7;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 13px 28px;
+      border: 1px solid #bbaaff;
+      border-radius: 30px;
+      background: #8b5cf6;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    button:hover {
+      background: #a78bfa;
+      transform: scale(1.05);
+    }
+
+    .gift {
+      font-size: 5rem;
+      animation: float 2s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      50% { transform: translateY(-12px); }
+    }
+
+    .heart {
+      color: #ff85b3;
+      font-size: 2rem;
+    }
+
+    #status {
+      padding: 30px;
+      max-width: 500px;
+      position: relative;
+      z-index: 2;
+    }
+
+    #status h1 {
+      font-size: 2rem;
     }
   </style>
 </head>
 
 <body>
-  <div class="stars"></div>
+  <div id="stars"></div>
 
-  <!-- SCREEN 1: Mysterious opening -->
-  <section id="openingScreen" class="screen">
-    <div class="content">
-      <p class="intro">✦ A little mystery awaits ✦</p>
+  <main id="status" hidden></main>
 
-      <h1>A small surprise<br>for you...</h1>
-
-      <p>Are you ready?</p>
-
-      <button onclick="openSurprise()">
-        Unlock ✦
-      </button>
-    </div>
+  <section id="screen1" class="screen">
+    <h1>A small surprise for you...</h1>
+    <p>Some little magic is waiting just for you ✨</p>
+    <p>Are you ready?</p>
+    <button onclick="nextScreen(2)">Unlock ✦</button>
   </section>
 
-  <!-- SCREEN 2: First surprise -->
-  <section id="nextScreen" class="screen hidden">
-    <div class="content">
-      <p class="intro">✦ SECRET UNLOCKED ✦</p>
-
-      <div class="magic">🔮</div>
-
-      <h1>Someone special<br>is celebrating!</h1>
-
-      <p>
-        Every beautiful memory starts with a little moment.
-        And today, something special is waiting for you.
-      </p>
-
-      <button onclick="showBirthday()">
-        Reveal the Magic ✨
-      </button>
-
-      <br>
-
-      <button class="back-button" onclick="goBack()">
-        Go Back
-      </button>
-    </div>
+  <section id="screen2" class="screen">
+    <div class="gift">🔐</div>
+    <h1>Secret Unlocked!</h1>
+    <p>You've made it this far. But there's one more little surprise...</p>
+    <button onclick="nextScreen(3)">Continue ✨</button>
   </section>
 
-  <!-- SCREEN 3: Birthday reveal -->
-  <section id="birthdayScreen" class="screen hidden">
-    <div class="content">
-      <p class="intro">✦ THIS MOMENT IS YOURS ✦</p>
-
-      <div class="magic">🎂🎉🎁</div>
-
-      <h1>Happy Birthday!</h1>
-
-      <p>
-        May your life be filled with beautiful memories,
-        unexpected happiness, endless laughter,
-        and people who make you feel special.
-      </p>
-
-      <p>Today is all about YOU. 💖</p>
-
-      <button onclick="restartSurprise()">
-        Experience Again ↻
-      </button>
-    </div>
+  <section id="screen3" class="screen">
+    <div class="gift">🎁</div>
+    <h1>Happy Birthday! 🎂</h1>
+    <p>
+      Today is all about you! 💖<br>
+      May your day be filled with laughter,
+      love, happiness, and beautiful memories.
+    </p>
+    <div class="heart">♥ ♥ ♥</div>
+    <p>Wishing you the most magical birthday ever! ✨</p>
   </section>
 
   <script>
-    function openSurprise() {
-      document.getElementById("openingScreen").classList.add("hidden");
-      document.getElementById("nextScreen").classList.remove("hidden");
+    // ====================================
+    // CUSTOMIZE THIS DATE FOR EACH CUSTOMER
+    // Format: YYYY-MM-DD
+    // ====================================
+    const birthdayDate = "2026-10-30";
+
+    // All times use Indian Standard Time (IST).
+    const birthdayStart = new Date(
+      birthdayDate + "T00:00:00+05:30"
+    ).getTime();
+
+    // Link activates 10 minutes before the birthday.
+    const startTime = birthdayStart - 10 * 60 * 1000;
+
+    // Link expires at the end of the birthday.
+    const expiryTime = new Date(
+      birthdayDate + "T23:59:59.999+05:30"
+    ).getTime();
+
+    const statusBox = document.getElementById("status");
+    const screens = document.querySelectorAll(".screen");
+    let expired = false;
+
+    // Create the background stars.
+    const stars = document.getElementById("stars");
+
+    for (let i = 0; i < 120; i++) {
+      const star = document.createElement("span");
+      star.className = "star";
+      star.style.left = Math.random() * 100 + "%";
+      star.style.top = Math.random() * 100 + "%";
+      star.style.animationDelay = Math.random() * 2 + "s";
+      stars.appendChild(star);
     }
 
-    function showBirthday() {
-      document.getElementById("nextScreen").classList.add("hidden");
-      document.getElementById("birthdayScreen").classList.remove("hidden");
+    function showStatus(title, message) {
+      screens.forEach(screen => screen.classList.remove("active"));
+      statusBox.hidden = false;
+      statusBox.innerHTML = `<h1>${title}</h1><p>${message}</p>`;
     }
 
-    function goBack() {
-      document.getElementById("nextScreen").classList.add("hidden");
-      document.getElementById("openingScreen").classList.remove("hidden");
+    function checkBirthdayLink() {
+      const now = Date.now();
+
+      if (now < startTime) {
+        showStatus(
+          "A surprise is waiting ✨",
+          "This special birthday surprise will unlock at 11:50 PM IST on the day before the birthday. Please come back then!"
+        );
+        return false;
+      }
+
+      if (now > expiryTime) {
+        expired = true;
+        showStatus(
+          "Surprise Expired 💫",
+          "This birthday surprise has reached the end of its magical time. Thank you for visiting!"
+        );
+        return false;
+      }
+
+      statusBox.hidden = true;
+      return true;
     }
 
-    function restartSurprise() {
-      document.getElementById("birthdayScreen").classList.add("hidden");
-      document.getElementById("openingScreen").classList.remove("hidden");
+    function nextScreen(number) {
+      if (!checkBirthdayLink() || expired) return;
+
+      screens.forEach(screen => screen.classList.remove("active"));
+      document.getElementById("screen" + number)
+        .classList.add("active");
     }
 
-    
-const birthdayDate = "2026-10-30";
+    // Check access before displaying the opening screen.
+    if (checkBirthdayLink()) {
+      document.getElementById("screen1").classList.add("active");
+    }
 
-// Indian Standard Time (UTC+05:30)
-const startTime = new Date(
-  `${birthdayDate}T00:00:00+05:30`
-).getTime() - 10 * 60 * 1000;
-
-const expiryTime = new Date(
-  `${birthdayDate}T23:59:59+05:30`
-).getTime();
-
-function checkBirthdayLink() {
-  const now = Date.now();
-
-  if (now < startTime) {
-    document.body.innerHTML =
-      "<h1>Your surprise isn't ready yet ✨</h1>";
-  } else if (now > expiryTime) {
-    document.body.innerHTML =
-      "<h1>This birthday surprise has expired 💫</h1>";
-  }
-}
-
-checkBirthdayLink();
-
+    // Check periodically in case the website remains open
+    // while the expiry time passes.
+    setInterval(() => {
+      if (!checkBirthdayLink()) {
+        expired = true;
+      }
+    }, 10000);
   </script>
-  
 </body>
 </html>
