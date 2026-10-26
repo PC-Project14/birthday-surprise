@@ -106,5 +106,35 @@
     </button>
   </main>
 </body>
+  
+<section id="nextScreen" style="
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #080b1c;
+  color: white;
+  z-index: 10;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+">
+  <p>✨ THE SECRET IS UNLOCKED ✨</p>
+  <h1>Someone special is celebrating!</h1>
+  <p>Every beautiful memory starts with a little moment.</p>
+  <button onclick="goBack()">Go Back</button>
+</section>
+
+<script>
+  function openSurprise() {
+    document.getElementById("nextScreen").style.display = "flex";
+  }
+
+  function goBack() {
+    document.getElementById("nextScreen").style.display = "none";
+  }
+</script>
+</body>
 </html>
 
