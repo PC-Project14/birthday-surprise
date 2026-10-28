@@ -35,14 +35,14 @@ drop policy if exists "admin can read birthday orders"
   on public.birthday_orders;
 create policy "admin can read birthday orders"
   on public.birthday_orders for select to authenticated
-  using ((auth.jwt()->>'email') = 'admin@example.com');
+  using ((auth.jwt()->>'email') = 'premkumarchouhan.1999@gmail.com');
 
 drop policy if exists "admin can update birthday orders"
   on public.birthday_orders;
 create policy "admin can update birthday orders"
   on public.birthday_orders for update to authenticated
-  using ((auth.jwt()->>'email') = 'admin@example.com')
-  with check ((auth.jwt()->>'email') = 'admin@example.com');
+  using ((auth.jwt()->>'email') = 'premkumarchouhan.1999@gmail.com')
+  with check ((auth.jwt()->>'email') = 'premkumarchouhan.1999@gmail.com');
 
 insert into storage.buckets
   (id, name, public, file_size_limit, allowed_mime_types)
@@ -70,7 +70,7 @@ create policy "admin can read birthday photos"
   on storage.objects for select to authenticated
   using (
     bucket_id = 'birthday-photos'
-    and (auth.jwt()->>'email') = 'admin@example.com'
+    and (auth.jwt()->>'email') = 'premkumarchouhan.1999@gmail.com'
   );
 
 create or replace function public.get_published_birthday_surprise(p_token text)
