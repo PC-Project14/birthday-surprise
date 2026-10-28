@@ -1,84 +1,92 @@
--- Birthday Surprise Studio: secure Supabase setup
--- Run this entire file in Supabase Dashboard -> SQL Editor -> New query.
--- This keeps project data and photos private to the signed-in owner.
 
+-- Birthday Surprise Studio database setup
 create extension if not exists pgcrypto;
 
-create table if not exists public.birthday_projects (
+create table if not exists public.birthday_orders (
   id uuid primary key default gen_random_uuid(),
-  owner_id uuid not null references auth.users(id) on delete cascade,
-  sender text not null default '',
-  recipient text not null default '',
+  sender text not null,
+  recipient text not null,
   birthday text,
   content jsonb not null default '{}'::jsonb,
   photo_paths jsonb not null default '{}'::jsonb,
+  status text not null default 'submitted'
+    check (status in ('submitted','published')),
+  share_token text unique,
+  published_content jsonb,
   created_at timestamptz not null default now()
 );
 
-alter table public.birthday_projects enable row level security;
+alter table public.birthday_orders enable row level security;
 
--- Owners can see and manage only their own projects.
-drop policy if exists "Owners can read their birthday projects" on public.birthday_projects;
-create policy "Owners can read their birthday projects"
-  on public.birthday_projects for select to authenticated
-  using (owner_id = (select auth.uid()));
+grant insert on public.birthday_orders to anon;
+grant select, update on public.birthday_orders to authenticated;
 
-drop policy if exists "Owners can insert their birthday projects" on public.birthday_projects;
-create policy "Owners can insert their birthday projects"
-  on public.birthday_projects for insert to authenticated
-  with check (owner_id = (select auth.uid()));
-
-drop policy if exists "Owners can update their birthday projects" on public.birthday_projects;
-create policy "Owners can update their birthday projects"
-  on public.birthday_projects for update to authenticated
-  using (owner_id = (select auth.uid()))
-  with check (owner_id = (select auth.uid()));
-
-drop policy if exists "Owners can delete their birthday projects" on public.birthday_projects;
-create policy "Owners can delete their birthday projects"
-  on public.birthday_projects for delete to authenticated
-  using (owner_id = (select auth.uid()));
-
--- Private bucket: no public read access. App rejects photos >= 5 MB.
-insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('birthday-photos', 'birthday-photos', false, 5242880,
-        array['image/jpeg','image/png','image/webp','image/gif','image/avif','image/heic','image/heif'])
-on conflict (id) do update set public = false, file_size_limit = 5242880,
-  allowed_mime_types = excluded.allowed_mime_types;
-
--- Object paths must start with the current user's auth UID: UID/project-id/filename.
-drop policy if exists "Owners can upload their birthday photos" on storage.objects;
-create policy "Owners can upload their birthday photos"
-  on storage.objects for insert to authenticated
+drop policy if exists "public can submit birthday orders"
+  on public.birthday_orders;
+create policy "public can submit birthday orders"
+  on public.birthday_orders for insert to anon
   with check (
-    bucket_id = 'birthday-photos'
-    and (storage.foldername(name))[1] = (select auth.uid())::text
+    status = 'submitted'
+    and share_token is null
+    and published_content is null
   );
 
-drop policy if exists "Owners can read their birthday photos" on storage.objects;
-create policy "Owners can read their birthday photos"
+drop policy if exists "admin can read birthday orders"
+  on public.birthday_orders;
+create policy "admin can read birthday orders"
+  on public.birthday_orders for select to authenticated
+  using ((auth.jwt()->>'email') = 'admin@example.com');
+
+drop policy if exists "admin can update birthday orders"
+  on public.birthday_orders;
+create policy "admin can update birthday orders"
+  on public.birthday_orders for update to authenticated
+  using ((auth.jwt()->>'email') = 'admin@example.com')
+  with check ((auth.jwt()->>'email') = 'admin@example.com');
+
+insert into storage.buckets
+  (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'birthday-photos',
+  'birthday-photos',
+  false,
+  5242880,
+  array['image/jpeg','image/png','image/webp','image/gif','image/avif']
+)
+on conflict (id) do update set
+  public = false,
+  file_size_limit = 5242880,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "customers can upload birthday photos"
+  on storage.objects;
+create policy "customers can upload birthday photos"
+  on storage.objects for insert to anon
+  with check (bucket_id = 'birthday-photos');
+
+drop policy if exists "admin can read birthday photos"
+  on storage.objects;
+create policy "admin can read birthday photos"
   on storage.objects for select to authenticated
   using (
     bucket_id = 'birthday-photos'
-    and (storage.foldername(name))[1] = (select auth.uid())::text
+    and (auth.jwt()->>'email') = 'admin@example.com'
   );
 
-drop policy if exists "Owners can update their birthday photos" on storage.objects;
-create policy "Owners can update their birthday photos"
-  on storage.objects for update to authenticated
-  using (
-    bucket_id = 'birthday-photos'
-    and (storage.foldername(name))[1] = (select auth.uid())::text
-  )
-  with check (
-    bucket_id = 'birthday-photos'
-    and (storage.foldername(name))[1] = (select auth.uid())::text
-  );
+create or replace function public.get_published_birthday_surprise(p_token text)
+returns jsonb
+language sql
+security definer
+set search_path = public
+as $$
+  select published_content
+  from public.birthday_orders
+  where share_token = p_token
+    and status = 'published'
+    and published_content is not null
+  limit 1;
+$$;
 
-drop policy if exists "Owners can delete their birthday photos" on storage.objects;
-create policy "Owners can delete their birthday photos"
-  on storage.objects for delete to authenticated
-  using (
-    bucket_id = 'birthday-photos'
-    and (storage.foldername(name))[1] = (select auth.uid())::text
-  );
+revoke all on function public.get_published_birthday_surprise(text) from public;
+grant execute on function public.get_published_birthday_surprise(text)
+  to anon, authenticated;
