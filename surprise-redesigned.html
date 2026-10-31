@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#100b20">
+<title>A Birthday Surprise</title>
+<style>
+:root{
+  --bg:#090814;--panel:rgba(24,18,43,.78);--panel2:rgba(38,26,62,.72);
+  --pink:#ff91d0;--lav:#bba4ff;--gold:#ffe3a1;--text:#fbf7ff;
+  --muted:#c2b8d8;--line:rgba(221,199,255,.2);--good:#9ff3c4;--bad:#ffb0bd;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;color:var(--text);
+  font:16px/1.7 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(ellipse at 50% -12%,rgba(151,93,205,.36),transparent 48%),
+    radial-gradient(circle at 8% 72%,rgba(255,105,186,.10),transparent 27%),
+    radial-gradient(circle at 92% 38%,rgba(112,105,255,.12),transparent 28%),
+    var(--bg);
+  overflow-x:hidden;
+}
+body:before,body:after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+}
+body:before{
+  opacity:.55;background-image:
+   radial-gradient(1px 1px at 8% 18%,#fff 98%,transparent),
+   radial-gradient(2px 2px at 25% 73%,#ffe8fa 98%,transparent),
+   radial-gradient(1px 1px at 48% 32%,#fff 98%,transparent),
+   radial-gradient(1px 1px at 69% 12%,#fff 98%,transparent),
+   radial-gradient(2px 2px at 83% 66%,#f5cfff 98%,transparent),
+   radial-gradient(1px 1px at 94% 28%,#fff 98%,transparent),
+   radial-gradient(1px 1px at 16% 91%,#fff 98%,transparent);
+  background-size:310px 250px;
+  animation:twinkle 7s ease-in-out infinite alternate;
+}
+body:after{
+  background:linear-gradient(180deg,transparent 65%,rgba(7,5,16,.5));
+}
+@keyframes twinkle{from{opacity:.25}to{opacity:.8}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 18px rgba(255,145,208,.18)}50%{box-shadow:0 0 38px rgba(187,164,255,.34)}}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{to{background-position:220% center}}
+@keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+.wrap{width:min(920px,100%);margin:auto;padding:28px 18px 70px}
+.topline{display:flex;align-items:center;justify-content:center;gap:10px;color:#d9c9f5;font-size:.76rem;letter-spacing:.22em;text-transform:uppercase;margin:8px 0 24px}
+.topline:before,.topline:after{content:"";height:1px;width:48px;background:linear-gradient(90deg,transparent,var(--pink))}
+.topline:after{transform:scaleX(-1)}
+.hero{text-align:center;padding:clamp(45px,9vw,88px) 12px 50px;position:relative}
+.orb{width:112px;height:112px;border-radius:50%;margin:0 auto 25px;display:grid;place-items:center;
+ background:radial-gradient(circle at 35% 30%,#fff0fb,#ff9bd7 22%,#8b65ca 66%,#31214d);
+ box-shadow:0 0 30px rgba(255,145,208,.35),0 0 85px rgba(158,121,255,.22);font-size:43px;animation:float 5s ease-in-out infinite}
+.eyebrow{color:var(--pink);letter-spacing:.2em;text-transform:uppercase;font-size:.78rem;font-weight:800}
+h1,h2,h3,p{margin-top:0}
+h1{font-family:Georgia,serif;font-weight:500;font-size:clamp(2.45rem,8vw,5.4rem);line-height:1.04;letter-spacing:-.045em;margin:14px auto 20px;max-width:790px}
+.gradient-text{background:linear-gradient(100deg,#fff4fb,#ff9bd7,#c3afff,#fff0c9);background-size:220% auto;color:transparent;background-clip:text;-webkit-background-clip:text;animation:shimmer 7s linear infinite}
+.subtitle{max-width:570px;margin:0 auto 28px;color:var(--muted);font-size:1.05rem}
+button{font:inherit}
+.btn{
+ border:1px solid transparent;border-radius:999px;padding:13px 24px;min-height:49px;
+ color:#21142e;background:linear-gradient(110deg,#ff9bd7,#c4a7ff 65%,#ffe2b4);
+ font-weight:800;cursor:pointer;box-shadow:0 8px 28px rgba(190,127,255,.2);
+ transition:transform .2s,filter .2s,box-shadow .2s;
+}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 12px 34px rgba(190,127,255,.3)}
+.btn:focus-visible,input:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.btn.secondary{background:rgba(255,255,255,.07);color:var(--text);border-color:var(--line);box-shadow:none}
+.btn:disabled{opacity:.55;cursor:default;transform:none}
+.card{
+ background:linear-gradient(145deg,rgba(35,26,57,.88),rgba(17,15,34,.88));
+ border:1px solid var(--line);border-radius:28px;padding:clamp(22px,5vw,42px);
+ box-shadow:0 24px 80px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.05);
+ backdrop-filter:blur(18px);margin:18px 0;animation:rise .65s both;
+}
+.hidden{display:none!important}
+.section-kicker{color:var(--pink);font-size:.76rem;letter-spacing:.2em;text-transform:uppercase;font-weight:800;margin-bottom:8px}
+h2{font:500 clamp(1.8rem,5vw,3rem)/1.15 Georgia,serif;margin-bottom:14px}
+.lead{color:#e6dff2;font-size:1.05rem;white-space:pre-wrap}
+.muted{color:var(--muted)}
+.step-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:25px}
+.step-count{font-size:.78rem;color:#d6c7ee;border:1px solid var(--line);padding:6px 12px;border-radius:999px;white-space:nowrap}
+.progress{height:4px;background:rgba(255,255,255,.09);border-radius:99px;overflow:hidden;margin:0 0 28px}
+.progress span{display:block;height:100%;width:25%;background:linear-gradient(90deg,var(--pink),var(--lav));border-radius:99px;transition:width .35s}
+.memories-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:22px}
+.memory-card{background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:20px;padding:12px;overflow:hidden}
+.memory-card img{display:block;width:100%;height:260px;object-fit:cover;border-radius:13px;background:#171127}
+.memory-card p{margin:10px 5px 3px;color:#e9dff5;white-space:pre-wrap}
+.empty-note{border:1px dashed var(--line);border-radius:18px;padding:22px;color:var(--muted);text-align:center}
+.challenge-box{margin-top:24px;padding:22px;border-radius:20px;background:linear-gradient(135deg,rgba(255,145,208,.09),rgba(187,164,255,.09));border:1px solid rgba(255,178,226,.2)}
+input{width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(8,7,19,.65);color:var(--text);font:inherit;margin:10px 0 14px}
+input::placeholder{color:#9488aa}
+#challengeMsg{min-height:28px;font-weight:700;margin:14px 0 0}
+.success{color:var(--good)}.warning{color:var(--bad)}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px;flex-wrap:wrap}
+.actions.end{justify-content:flex-end}
+.final-letter{white-space:pre-wrap;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:18px;padding:22px;color:#f3eafa}
+.candle{font-size:clamp(2.5rem,8vw,4.5rem);text-align:center;filter:drop-shadow(0 0 18px rgba(255,194,132,.45));margin:18px 0;animation:float 4s ease-in-out infinite}
+.footer{text-align:center;color:#817796;font-size:.8rem;margin-top:38px}
+#loading{min-height:80vh;display:grid;place-content:center;text-align:center}
+.loading-ring{width:48px;height:48px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--pink);border-radius:50%;margin:22px auto;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:620px){
+ .wrap{padding:16px 13px 45px}.hero{padding:42px 4px}
+ .memories-grid{grid-template-columns:1fr}.memory-card img{height:auto;max-height:430px;object-fit:contain}
+ .actions .btn{width:100%}.step-head{align-items:flex-start;flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div id="loading">
+    <div>
+      <div class="orb">✦</div>
+      <p class="eyebrow">A little magic is getting ready</p>
+      <h2>Opening your surprise…</h2>
+      <div class="loading-ring" aria-hidden="true"></div>
+      <p class="muted">Just a moment</p>
+    </div>
+  </div>
+
+  <div id="app" class="hidden">
+    <div class="topline">A moment made just for you</div>
+
+    <header class="hero" id="welcome">
+      <div class="orb">🎁</div>
+      <p class="eyebrow">✦ A little surprise for you ✦</p>
+      <h1 class="gradient-text" id="opening"></h1>
+      <p class="subtitle">Some moments deserve to be celebrated slowly. Your little journey begins here.</p>
+      <button class="btn" id="unlock">Unlock your surprise&nbsp; ✨</button>
+    </header>
+
+    <section class="card hidden" id="journey" aria-live="polite">
+      <div class="step-head">
+        <div>
+          <p class="section-kicker" id="stepKicker">The celebration begins</p>
+          <h2 id="stepTitle"></h2>
+        </div>
+        <span class="step-count" id="stepCount">01 / 04</span>
+      </div>
+      <div class="progress"><span id="progressBar"></span></div>
+
+      <div id="stage1" class="stage">
+        <p class="lead" id="wish"></p>
+        <div class="actions end">
+          <button class="btn" data-next="2">Next&nbsp; →</button>
+        </div>
+      </div>
+
+      <div id="stage2" class="stage hidden">
+        <p class="lead">Every picture keeps a little piece of a beautiful story.</p>
+        <div id="memories" class="memories-grid"></div>
+        <div class="actions">
+          <button class="btn secondary" data-prev="1">← Back</button>
+          <button class="btn" data-next="3">Continue&nbsp; →</button>
+        </div>
+      </div>
+
+      <div id="stage3" class="stage hidden">
+        <p class="lead">A tiny challenge, just to make this surprise even more special.</p>
+        <div class="challenge-box">
+          <p class="section-kicker">A little memory test</p>
+          <h3 id="question" style="font:500 1.35rem/1.35 Georgia,serif"></h3>
+          <label for="answer" class="muted">Your answer</label>
+          <input id="answer" placeholder="Type your answer here…" autocomplete="off">
+          <button class="btn" id="check">Unlock the next surprise</button>
+          <p id="challengeMsg" aria-live="polite"></p>
+        </div>
+        <div class="actions">
+          <button class="btn secondary" data-prev="2">← Back</button>
+        </div>
+      </div>
+
+      <div id="stage4" class="stage hidden">
+        <div class="candle" aria-hidden="true">🕯️ ✨ 🕯️</div>
+        <p class="section-kicker">Make a wish</p>
+        <h2>One wish, just for you</h2>
+        <p class="lead" id="candle"></p>
+        <div class="final-letter">
+          <p class="section-kicker">A letter from the heart</p>
+          <h2 style="font-size:1.7rem">💌 A letter for you</h2>
+          <p id="letter" style="white-space:pre-wrap;margin-bottom:0"></p>
+        </div>
+        <div class="actions">
+          <button class="btn secondary" data-prev="3">← Back</button>
+          <button class="btn" id="celebrateAgain">Replay the magic&nbsp; ✨</button>
+        </div>
+      </div>
+    </section>
+    <div class="footer">Made with a little sparkle and a lot of heart ✦</div>
+  </div>
+</main>
+
+<script type="module">
+import { createClient } from
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const URL = 'https://xvfxoxllsqcrfznxiudu.supabase.co';
+const KEY = 'sb_publishable_3WgnEFrtZLElVggSe_QqMg_TwethHbG';
+
+const $ = id => document.getElementById(id);
+function put(id, value) { $(id).textContent = value || ''; }
+
+function showStage(number) {
+  for (let i = 1; i <= 4; i++) {
+    $('stage' + i).classList.toggle('hidden', i !== number);
+  }
+  const labels = {
+    1: ['The celebration begins', 'A wish for you'],
+    2: ['Moments to remember', 'Our memories'],
+    3: ['A little playful moment', 'One little challenge'],
+    4: ['The sweetest ending', 'Make a wish']
+  };
+  put('stepKicker', labels[number][0]);
+  put('stepTitle', labels[number][1]);
+  put('stepCount', String(number).padStart(2, '0') + ' / 04');
+  $('progressBar').style.width = (number * 25) + '%';
+  $('journey').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function addPhoto(container, caption, photo, altText) {
+  if (!photo) return;
+  const box = document.createElement('article');
+  box.className = 'memory-card';
+  const img = document.createElement('img');
+  img.src = photo;
+  img.alt = caption || altText;
+  img.loading = 'lazy';
+  const p = document.createElement('p');
+  p.textContent = caption || '';
+  box.append(img, p);
+  container.append(box);
+}
+
+async function start() {
+  try {
+    if (KEY.includes('PASTE_')) {
+      throw Error('This surprise site is not configured yet.');
+    }
+
+    const token = new URLSearchParams(location.search).get('token');
+    if (!token) throw Error('This birthday link is incomplete.');
+
+    const sb = createClient(URL, KEY);
+    const { data, error } = await sb.rpc(
+      'get_published_birthday_surprise',
+      { p_token: token }
+    );
+    if (error) throw error;
+    if (!data) throw Error('This surprise link is not available.');
+
+    const d = data;
+    put('opening', d.opening || `A small surprise for ${d.recipient || 'you'}…`);
+    put('wish', d.birthdayWish);
+    put('question', d.challengeQuestion);
+    put('candle', d.candleMessage);
+    put('letter', d.secretLetter);
+
+    const memories = $('memories');
+    let photoCount = 0;
+
+    for (const [label, caption, photo] of [
+      ['memory-1', d.memoryCaption1, d.photos?.['memory-1']],
+      ['memory-2', d.memoryCaption2, d.photos?.['memory-2']]
+    ]) {
+      if (photo) {
+        addPhoto(memories, caption, photo, 'Birthday memory');
+        photoCount++;
+      }
+    }
+
+    for (let i = 1; i <= 10; i++) {
+      const key = `timeline-${String(i).padStart(2, '0')}`;
+      const photo = d.photos?.[key];
+      if (photo) {
+        addPhoto(memories, d[`timelineCaption${i}`], photo, 'Timeline memory');
+        photoCount++;
+      }
+    }
+
+    if (!photoCount) {
+      const note = document.createElement('div');
+      note.className = 'empty-note';
+      note.textContent = 'Your special memories will appear here.';
+      memories.append(note);
+    }
+
+    $('loading').classList.add('hidden');
+    $('app').classList.remove('hidden');
+
+    $('unlock').onclick = () => {
+      $('welcome').classList.add('hidden');
+      $('journey').classList.remove('hidden');
+      showStage(1);
+    };
+
+    document.querySelectorAll('[data-next]').forEach(button => {
+      button.addEventListener('click', () => showStage(Number(button.dataset.next)));
+    });
+    document.querySelectorAll('[data-prev]').forEach(button => {
+      button.addEventListener('click', () => showStage(Number(button.dataset.prev)));
+    });
+
+    // Preserve the original three-attempt challenge behavior.
+    let attempts = 0;
+    let completed = false;
+    const expected = String(d.challengeAnswer || '').trim().toLowerCase();
+
+    function unlockEnding(messageText) {
+      completed = true;
+      put('challengeMsg', messageText);
+      $('challengeMsg').className = 'success';
+      $('check').disabled = true;
+      showStage(4);
+    }
+
+    $('check').onclick = () => {
+      if (completed) return;
+      const answer = $('answer').value.trim().toLowerCase();
+
+      if (expected && answer && answer === expected) {
+        unlockEnding('🎉 Correct! You know our memories so well! 💖✨');
+        return;
+      }
+
+      attempts++;
+      if (attempts >= 3) {
+        unlockEnding('💗 Three attempts completed! Your surprise is unlocked! 🎁');
+      } else {
+        const remaining = 3 - attempts;
+        put('challengeMsg', `Not quite! Try again 💕 ${remaining} attempt(s) left.`);
+        $('challengeMsg').className = 'warning';
+      }
+    };
+
+    $('answer').addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        $('check').click();
+      }
+    });
+
+    $('celebrateAgain').onclick = () => {
+      attempts = 0;
+      completed = false;
+      $('check').disabled = false;
+      $('answer').value = '';
+      put('challengeMsg', '');
+      $('welcome').classList.remove('hidden');
+      $('journey').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+  } catch (e) {
+    $('loading').replaceChildren();
+    const title = document.createElement('h1');
+    const message = document.createElement('p');
+    title.textContent = '💫 Surprise unavailable';
+    message.textContent = String(e.message || e);
+    $('loading').append(title, message);
+  }
+}
+start();
+</script>
+</body>
+</html>
